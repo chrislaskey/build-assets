@@ -16,6 +16,7 @@ def monitor():
 
 def _trigger_build_if_a_file_has_been_modified():
     global target_dirs, latest_modified
+    start_time = time.time()
     for dir in target_dirs:
         for file_root, file_dir, files in walk(dir):
             for filename in files:
@@ -25,6 +26,8 @@ def _trigger_build_if_a_file_has_been_modified():
                     if last_modified > latest_modified:
                         latest_modified = last_modified
                         print("The file {0} is modified. Triggered build at {1}".format(file, datetime.now()))
+    end_time = time.time()
+    print("Start: {0}, End: {1}, Difference: {2}".format(start_time, end_time, (end_time - start_time)))
 
 def _get_last_modified(file):
     return path.getmtime(file)
