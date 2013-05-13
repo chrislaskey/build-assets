@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 
 import time
-import os.path
+from datetime import datetime
+from os import path, walk
 
 target_dirs = ["test-dir"]
 
@@ -14,16 +15,19 @@ def monitor():
         time.sleep(1)
 
 def _trigger_build_if_a_file_has_been_modified():
-    global latest_modified
-    path = "test-dir/test-file"
-    if os.path.exists(path):
-        last_modified = _get_last_modified(path)
-        if last_modified > latest_modified:
-            latest_modified = last_modified
-            print("building")
+    global target_dirs, latest_modified
+    for dir in target_dirs:
+        for file_root, file_dir, files in walk(dir):
+            for filename in files:
+                file = path.join(file_root, filename)
+                if path.exists(file):
+                    last_modified = _get_last_modified(file)
+                    if last_modified > latest_modified:
+                        latest_modified = last_modified
+                        print("The file {0} is modified. Triggered build at {1}".format(file, datetime.now()))
 
 def _get_last_modified(file):
-    return os.path.getmtime(file)
+    return path.getmtime(file)
 
 if __name__ == "__main__":
     try:
